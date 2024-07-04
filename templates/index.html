@@ -20,19 +20,30 @@
         <div class="container">
                 <div class="row">
                         <div class="col-6">
-                                <h2>上傳xlsx至資料庫 : </h2><input type="file" id="file-input2"/>
+                                <h2>上傳xlsx至資料庫(新增) : </h2><input type="file" id="file-input2"/>
                         </div>
                         <div class="col-6">
-                                <h2>送出修改資料至資料庫 : </h2><button id="update_database">送出</button>
+                                <h2>送出修改資料至資料庫(修改) : </h2><button id="update_database">送出</button>
                         </div>
                 </div>
                 <br>
                 <div class="row">
-                        <h2>匯出客戶資料 : </h2><input type="file" id="file-input"/>
+                        <div class="col-6">
+                                <h2>匯入客戶資料 : </h2><input type="file" id="file-input"/>
+                        </div>
+                        <div class="col-6">
+                                <h2>下載合併資料 : </h2><button id="download">下載</button>
+                        </div>
                 </div>
                 <br>
                 <div class="row">
                         <div class="col" id="table_space">
+                                
+                        </div>
+                        
+                </div>
+                <div class="row">
+                        <div class="col" id="table_space2">
                                 
                         </div>
                 </div>
@@ -43,11 +54,29 @@
         document.getElementById('file-input').addEventListener('change', readSingleFile);
         document.getElementById('file-input2').addEventListener('change', readSingleFile2);
         document.getElementById('update_database').addEventListener('click', update_database);
-        
+        document.getElementById('download').addEventListener('click', download);
+
         async function update_database(){
                 var data = newtable.rows().data();
                 var dataArray = data.toArray();
                 var jsonData = JSON.stringify(dataArray);
+
+                //如果是修改上傳後的table
+                var table = document.getElementById("excel2");
+                if(table !== null){
+                        // 使用 map 方法遍历数组，并从每个对象中删除特定的属性
+                        var modifiedArray = dataArray.map(function(obj) {
+                                // 创建一个新对象，复制原对象的所有属性
+                                var newObj = Object.assign({}, obj);
+                                // 删除 newObj 中的 element1 和 element2 属性
+                                delete newObj.date;
+                                delete newObj.money;
+                                // 返回修改后的对象
+                                return newObj;
+                        });
+                        //console.log(modifiedArray);
+                        dataArray = modifiedArray
+                }
                 //console.log(jsonData);
                 //console.log(dataArray);
                 const options = {
@@ -162,9 +191,70 @@
                 .then(response => response.json())
                 .then(json => {
                         temp_json = JSON.parse(json["result"]);
+                        console.log(temp_json);
+                        var table_space = document.getElementById("table_space");
+                        table_space.style.display="none";
+
+                        var cc = document.getElementById("table_space2");
+                        var table = document.createElement("table");
+                        table.id = "excel2";
+                        cc.appendChild(table);
+                        newtable = $('#excel2').DataTable({
+                                        "data": temp_json,
+                                        "columns": [
+                                                { data: 'date', title: "date"},
+                                                { data: 'name', title: "name"},
+                                                { data: 'money', title: "money"},
+                                                { data: 'id', title: "id"},
+                                                { data: 'identity', title: "identity"},
+                                                { data: 'address', title: "address"},
+                                                { data: 'phone', title: "phone"},
+                                                { data: 'remark', title: "remark"},
+                                                { data: 'number', title: "number"},
+                                                {
+                                                        title: 'Delete',
+                                                        data: null,
+                                                        defaultContent: '<button class="btn btn-danger btn-sm">Delete</button>'
+                                                }
+                                        ],
+                                        //"searching": false,
+                                        "ordering": false,
+                                        "select": true
+                        })
+                        $('#excel2 tbody').on('click', 'button.btn-danger', function() {
+                                var row = newtable.row($(this).parents('tr'));
+                                row.remove().draw(false);
+                        });
+                        newtable.on('click', 'tbody td', async function() {
+                                var cell = newtable.cell(this);
+                                var cellData = cell.data();
+                                var colIdx = cell.index().column; // 取得該單元格的直欄索引
+                                var colName = newtable.settings().init().columns[colIdx].title; // 取得直欄名稱
+                                //console.log("Clicked column name:", colName);
+                                //console.log("Cell value:", cellData);
+                                if( cellData == "" || cellData == null ){
+                                        cellData = "";
+                                }
+                                const { value: ipAddress } = await Swal.fire({
+                                        title: "請輸入要修改的內容",
+                                        input: "text",
+                                        inputLabel: colName,
+                                        inputValue: cellData,
+                                        showCancelButton: true,
+                                        inputValidator: (value) => {
+                                                if (!value) {
+                                                        return "You need to write something!";
+                                                }
+                                        }
+                                });
+                                if (ipAddress) {
+                                        cell.data(`${ipAddress}`);
+                                }
+                        });
+
                         //console.log(temp_json);
                         // Convert JSON to Excel workbook
-                        const wb = XLSX.utils.book_new();
+                        /*const wb = XLSX.utils.book_new();
                         const ws = XLSX.utils.json_to_sheet(temp_json);
 
                         XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
@@ -181,7 +271,7 @@
                         document.body.appendChild(a);
                         a.click();
                         document.body.removeChild(a);
-                        URL.revokeObjectURL(url);
+                        URL.revokeObjectURL(url);*/
                 })
                 .catch(error => console.error('Error:', error));
         }
@@ -213,6 +303,30 @@
                         
                 })
                 .catch(error => console.error('Error:', error));
+        }
+
+        function download(){
+                var data = newtable.rows().data();
+                var dataArray = data.toArray();
+                var jsonData = JSON.stringify(dataArray);
+                const wb = XLSX.utils.book_new();
+                const ws = XLSX.utils.json_to_sheet(dataArray);
+
+                XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+
+                // Save workbook to Excel file
+                const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+                const blob = new Blob([wbout], { type: 'application/octet-stream' });
+
+                // Trigger file download
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'output.xlsx';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
         }
 </script>
 </html>
