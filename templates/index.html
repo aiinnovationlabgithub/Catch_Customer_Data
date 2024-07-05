@@ -33,6 +33,9 @@
                 #excel2 tbody tr:nth-child(even) {
                         background-color: #ffffff; /* 或者其他你想要的颜色 */
                 }
+
+                h1 {text-align: center;}
+                body {background-color: rgba(173, 214, 255, 0.3);}
         </style>
 </head>
 <body>
@@ -45,6 +48,7 @@
                 </li>
               </ul>
         <br>
+        <h1 style="text-align: center;">創新研究部-公益專案</h1>
         <div class="container">
                 <div id="tab1">
                         <div class="row">
@@ -83,6 +87,7 @@
 </body>
 <script>
         var newtable;
+        var newtable2;
         document.getElementById('file-input').addEventListener('change', readSingleFile);
         document.getElementById('file-input2').addEventListener('change', readSingleFile2);
         document.getElementById('update_database').addEventListener('click', update_database);
@@ -126,22 +131,19 @@
                 var dataArray = data.toArray();
                 var jsonData = JSON.stringify(dataArray);
 
-                //如果是修改上傳後的table
-                var table = document.getElementById("excel2");
-                if(table !== null){
-                        // 使用 map 方法遍历数组，并从每个对象中删除特定的属性
-                        var modifiedArray = dataArray.map(function(obj) {
-                                // 创建一个新对象，复制原对象的所有属性
-                                var newObj = Object.assign({}, obj);
-                                // 删除 newObj 中的 element1 和 element2 属性
-                                delete newObj.date;
-                                delete newObj.money;
-                                // 返回修改后的对象
-                                return newObj;
-                        });
-                        //console.log(modifiedArray);
-                        dataArray = modifiedArray
-                }
+                // 使用 map 方法遍历数组，并从每个对象中删除特定的属性
+                /*var modifiedArray = dataArray.map(function(obj) {
+                        // 创建一个新对象，复制原对象的所有属性
+                        var newObj = Object.assign({}, obj);
+                        // 删除 newObj 中的 element1 和 element2 属性
+                        delete newObj.date;
+                        delete newObj.money;
+                        // 返回修改后的对象
+                        return newObj;
+                });*/
+                //console.log(modifiedArray);
+                dataArray = modifiedArray
+                
                 //console.log(jsonData);
                 //console.log(dataArray);
                 const options = {
@@ -200,40 +202,34 @@
                                         "select": true
                         })
                         $('#excel tbody').on('click', 'button.btn-danger', function() {
-                                var table = document.getElementById("excel2");
-                                if(table == null){
-                                        var row = newtable.row($(this).parents('tr'));
-                                        row.remove().draw(false);
-                                }
+                                var row = newtable.row($(this).parents('tr'));
+                                row.remove().draw(false);
                         });
                         newtable.on('click', 'tbody td', async function() {
-                                var table = document.getElementById("excel2");
-                                if(table == null){
-                                        var cell = newtable.cell(this);
-                                        var cellData = cell.data();
-                                        var colIdx = cell.index().column; // 取得該單元格的直欄索引
-                                        var colName = newtable.settings().init().columns[colIdx].title; // 取得直欄名稱
-                                        //console.log("Clicked column name:", colName);
-                                        //console.log("Cell value:", cellData);
-                                        if( cellData == "" || cellData == null ){
-                                                cellData = "";
-                                        }
-                                        if(colName.indexOf('delete') == -1){
-                                                const { value: ipAddress } = await Swal.fire({
-                                                        title: "請輸入要修改的內容",
-                                                        input: "text",
-                                                        inputLabel: colName,
-                                                        inputValue: cellData,
-                                                        showCancelButton: true,
-                                                        inputValidator: (value) => {
-                                                                if (!value) {
-                                                                        return "You need to write something!";
-                                                                }
+                                var cell = newtable.cell(this);
+                                var cellData = cell.data();
+                                var colIdx = cell.index().column; // 取得該單元格的直欄索引
+                                var colName = newtable.settings().init().columns[colIdx].title; // 取得直欄名稱
+                                //console.log("Clicked column name:", colName);
+                                //console.log("Cell value:", cellData);
+                                if( cellData == "" || cellData == null ){
+                                        cellData = "";
+                                }
+                                if(colName.indexOf('delete') == -1){
+                                        const { value: ipAddress } = await Swal.fire({
+                                                title: "請輸入要修改的內容",
+                                                input: "text",
+                                                inputLabel: colName,
+                                                inputValue: cellData,
+                                                showCancelButton: true,
+                                                inputValidator: (value) => {
+                                                        if (!value) {
+                                                                return "You need to write something!";
                                                         }
-                                                });
-                                                if (ipAddress) {
-                                                        cell.data(`${ipAddress}`);
                                                 }
+                                        });
+                                        if (ipAddress) {
+                                                cell.data(`${ipAddress}`);
                                         }
                                 }
                         });
@@ -274,7 +270,7 @@
                         table.id = "excel2";
                         table.setAttribute("class","cell-border");
                         cc.appendChild(table);
-                        newtable = $('#excel2').DataTable({
+                        newtable2 = $('#excel2').DataTable({
                                         "data": temp_json,
                                         "columns": [
                                                 { data: 'date', title: "date"},
@@ -286,17 +282,17 @@
                                                 { data: 'phone', title: "phone"},
                                                 { data: 'remark', title: "remark"},
                                                 { data: 'number', title: "number"},
-                                                {
+                                                /*{
                                                         title: 'delete',
                                                         data: null,
                                                         defaultContent: '<button class="btn btn-danger btn-sm">Delete</button>'
-                                                }
+                                                }*/
                                         ],
                                         //"searching": false,
-                                        "ordering": false,
+                                        "ordering": false, 
                                         "select": true
                         })
-                        $('#excel2 tbody').on('click', 'button.btn-danger', function() {
+                        /*$('#excel2 tbody').on('click', 'button.btn-danger', function() {
                                 var row = newtable.row($(this).parents('tr'));
                                 row.remove().draw(false);
                         });
@@ -328,7 +324,7 @@
                                                 cell.data(`${ipAddress}`);
                                         }
                                 }
-                        });
+                        });*/
 
                         //console.log(temp_json);
                 })
@@ -365,7 +361,7 @@
         }
 
         function download(){
-                var data = newtable.rows().data();
+                var data = newtable2.rows().data();
                 var dataArray = data.toArray();
                 var jsonData = JSON.stringify(dataArray);
                 const wb = XLSX.utils.book_new();
