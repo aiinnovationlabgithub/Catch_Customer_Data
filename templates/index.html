@@ -124,7 +124,7 @@
                                                 { data: 'remark', title: "remark"},
                                                 { data: 'number', title: "number"},
                                                 {
-                                                        title: 'Delete',
+                                                        title: 'delete',
                                                         data: null,
                                                         defaultContent: '<button class="btn btn-danger btn-sm">Delete</button>'
                                                 }
@@ -147,20 +147,22 @@
                                 if( cellData == "" || cellData == null ){
                                         cellData = "";
                                 }
-                                const { value: ipAddress } = await Swal.fire({
-                                        title: "請輸入要修改的內容",
-                                        input: "text",
-                                        inputLabel: colName,
-                                        inputValue: cellData,
-                                        showCancelButton: true,
-                                        inputValidator: (value) => {
-                                                if (!value) {
-                                                        return "You need to write something!";
+                                if(colName.indexOf('delete') == -1){
+                                        const { value: ipAddress } = await Swal.fire({
+                                                title: "請輸入要修改的內容",
+                                                input: "text",
+                                                inputLabel: colName,
+                                                inputValue: cellData,
+                                                showCancelButton: true,
+                                                inputValidator: (value) => {
+                                                        if (!value) {
+                                                                return "You need to write something!";
+                                                        }
                                                 }
+                                        });
+                                        if (ipAddress) {
+                                                cell.data(`${ipAddress}`);
                                         }
-                                });
-                                if (ipAddress) {
-                                        cell.data(`${ipAddress}`);
                                 }
                         });
                 }
@@ -212,7 +214,7 @@
                                                 { data: 'remark', title: "remark"},
                                                 { data: 'number', title: "number"},
                                                 {
-                                                        title: 'Delete',
+                                                        title: 'delete',
                                                         data: null,
                                                         defaultContent: '<button class="btn btn-danger btn-sm">Delete</button>'
                                                 }
@@ -235,43 +237,27 @@
                                 if( cellData == "" || cellData == null ){
                                         cellData = "";
                                 }
-                                const { value: ipAddress } = await Swal.fire({
-                                        title: "請輸入要修改的內容",
-                                        input: "text",
-                                        inputLabel: colName,
-                                        inputValue: cellData,
-                                        showCancelButton: true,
-                                        inputValidator: (value) => {
-                                                if (!value) {
-                                                        return "You need to write something!";
+                                //console.log(colName.indexOf('money'));
+                                if(colName.indexOf('money') == -1 && colName.indexOf('金額') == -1 && colName.indexOf('delete') == -1){
+                                        const { value: ipAddress } = await Swal.fire({
+                                                title: "請輸入要修改的內容",
+                                                input: "text",
+                                                inputLabel: colName,
+                                                inputValue: cellData,
+                                                showCancelButton: true,
+                                                inputValidator: (value) => {
+                                                        if (!value) {
+                                                                return "You need to write something!";
+                                                        }
                                                 }
+                                        });
+                                        if (ipAddress) {
+                                                cell.data(`${ipAddress}`);
                                         }
-                                });
-                                if (ipAddress) {
-                                        cell.data(`${ipAddress}`);
                                 }
                         });
 
                         //console.log(temp_json);
-                        // Convert JSON to Excel workbook
-                        /*const wb = XLSX.utils.book_new();
-                        const ws = XLSX.utils.json_to_sheet(temp_json);
-
-                        XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
-
-                        // Save workbook to Excel file
-                        const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-                        const blob = new Blob([wbout], { type: 'application/octet-stream' });
-
-                        // Trigger file download
-                        const url = URL.createObjectURL(blob);
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.download = 'output.xlsx';
-                        document.body.appendChild(a);
-                        a.click();
-                        document.body.removeChild(a);
-                        URL.revokeObjectURL(url);*/
                 })
                 .catch(error => console.error('Error:', error));
         }
