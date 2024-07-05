@@ -13,38 +13,70 @@
                 div.container {
                         width: 80%;
                 }
+
+                /* 设置奇数行的底色 */
+                #excel tbody tr:nth-child(odd) {
+                        background-color: #f2f2f2; /* 或者其他你想要的颜色 */
+                }
+
+                /* 设置偶数行的底色 */
+                #excel tbody tr:nth-child(even) {
+                        background-color: #ffffff; /* 或者其他你想要的颜色 */
+                }
+
+                /* 设置奇数行的底色 */
+                #excel2 tbody tr:nth-child(odd) {
+                        background-color: #f2f2f2; /* 或者其他你想要的颜色 */
+                }
+
+                /* 设置偶数行的底色 */
+                #excel2 tbody tr:nth-child(even) {
+                        background-color: #ffffff; /* 或者其他你想要的颜色 */
+                }
         </style>
 </head>
 <body>
+        <ul class="nav nav-tabs justify-content-center">
+                <li class="nav-item">
+                  <a class="nav-link active" aria-current="page" href="#" id="tab_database">資料庫</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="#" id="tab_mergedata">合併資料</a>
+                </li>
+              </ul>
         <br>
         <div class="container">
-                <div class="row">
-                        <div class="col-6">
-                                <h2>上傳xlsx至資料庫(新增) : </h2><input type="file" id="file-input2"/>
+                <div id="tab1">
+                        <div class="row">
+                                <div class="col-6">
+                                        <h2>上傳xlsx至資料庫(新增) : </h2><input type="file" id="file-input2"/>
+                                </div>
+                                <div class="col-6">
+                                        <h2>送出修改資料至資料庫(修改) : </h2><button id="update_database">送出</button>
+                                </div>
                         </div>
-                        <div class="col-6">
-                                <h2>送出修改資料至資料庫(修改) : </h2><button id="update_database">送出</button>
-                        </div>
-                </div>
-                <br>
-                <div class="row">
-                        <div class="col-6">
-                                <h2>匯入客戶資料 : </h2><input type="file" id="file-input"/>
-                        </div>
-                        <div class="col-6">
-                                <h2>下載合併資料 : </h2><button id="download">下載</button>
-                        </div>
-                </div>
-                <br>
-                <div class="row">
-                        <div class="col" id="table_space">
+                        <br>
+                        <div class="row">
+                                <div class="col" id="table_space">
+                                        
+                                </div>
                                 
                         </div>
-                        
                 </div>
-                <div class="row">
-                        <div class="col" id="table_space2">
-                                
+                <div id="tab2" style="display: none;">
+                        <div class="row">
+                                <div class="col-6">
+                                        <h2>匯入客戶資料 : </h2><input type="file" id="file-input"/>
+                                </div>
+                                <div class="col-6">
+                                        <h2>下載合併資料 : </h2><button id="download">下載</button>
+                                </div>
+                        </div>
+                        <br>
+                        <div class="row">
+                                <div class="col" id="table_space2">
+                                        
+                                </div>
                         </div>
                 </div>
         </div>
@@ -55,6 +87,39 @@
         document.getElementById('file-input2').addEventListener('change', readSingleFile2);
         document.getElementById('update_database').addEventListener('click', update_database);
         document.getElementById('download').addEventListener('click', download);
+        document.getElementById('tab_database').addEventListener('click', function(event) {
+                change_tab(this);
+        });
+        document.getElementById('tab_mergedata').addEventListener('click', function(event) {
+                change_tab(this);
+        });
+
+        function change_tab(obj){
+                if(obj.id == "tab_database"){
+                        var tab_database = document.getElementById("tab_database");
+                        var tab_mergedata = document.getElementById("tab_mergedata");
+                        var tab1 = document.getElementById("tab1");
+                        var tab2 = document.getElementById("tab2");
+                        tab1.style.display="block";
+                        tab2.style.display="none";
+                        tab_mergedata.setAttribute("class","nav-link");
+                        tab_mergedata.removeAttribute("aria-current");
+                        tab_database.setAttribute("class","nav-link active");
+                        tab_database.setAttribute("aria-current","page");
+                }
+                else if(obj.id == "tab_mergedata"){
+                        var tab_database = document.getElementById("tab_database");
+                        var tab_mergedata = document.getElementById("tab_mergedata");
+                        var tab1 = document.getElementById("tab1");
+                        var tab2 = document.getElementById("tab2");
+                        tab1.style.display="none";
+                        tab2.style.display="block";
+                        tab_database.setAttribute("class","nav-link");
+                        tab_database.removeAttribute("aria-current");
+                        tab_mergedata.setAttribute("class","nav-link active");
+                        tab_mergedata.setAttribute("aria-current","page");
+                }
+        }
 
         async function update_database(){
                 var data = newtable.rows().data();
@@ -111,7 +176,8 @@
 
                         var cc = document.getElementById("table_space");
                         var table = document.createElement("table");
-                        table.id = "excel";
+                        table.id = "excel";//class="cell-border"
+                        table.setAttribute("class","cell-border");
                         cc.appendChild(table);
                         newtable = $('#excel').DataTable({
                                         "data": temp_json,
@@ -134,34 +200,40 @@
                                         "select": true
                         })
                         $('#excel tbody').on('click', 'button.btn-danger', function() {
-                                var row = newtable.row($(this).parents('tr'));
-                                row.remove().draw(false);
+                                var table = document.getElementById("excel2");
+                                if(table == null){
+                                        var row = newtable.row($(this).parents('tr'));
+                                        row.remove().draw(false);
+                                }
                         });
                         newtable.on('click', 'tbody td', async function() {
-                                var cell = newtable.cell(this);
-                                var cellData = cell.data();
-                                var colIdx = cell.index().column; // 取得該單元格的直欄索引
-                                var colName = newtable.settings().init().columns[colIdx].title; // 取得直欄名稱
-                                //console.log("Clicked column name:", colName);
-                                //console.log("Cell value:", cellData);
-                                if( cellData == "" || cellData == null ){
-                                        cellData = "";
-                                }
-                                if(colName.indexOf('delete') == -1){
-                                        const { value: ipAddress } = await Swal.fire({
-                                                title: "請輸入要修改的內容",
-                                                input: "text",
-                                                inputLabel: colName,
-                                                inputValue: cellData,
-                                                showCancelButton: true,
-                                                inputValidator: (value) => {
-                                                        if (!value) {
-                                                                return "You need to write something!";
+                                var table = document.getElementById("excel2");
+                                if(table == null){
+                                        var cell = newtable.cell(this);
+                                        var cellData = cell.data();
+                                        var colIdx = cell.index().column; // 取得該單元格的直欄索引
+                                        var colName = newtable.settings().init().columns[colIdx].title; // 取得直欄名稱
+                                        //console.log("Clicked column name:", colName);
+                                        //console.log("Cell value:", cellData);
+                                        if( cellData == "" || cellData == null ){
+                                                cellData = "";
+                                        }
+                                        if(colName.indexOf('delete') == -1){
+                                                const { value: ipAddress } = await Swal.fire({
+                                                        title: "請輸入要修改的內容",
+                                                        input: "text",
+                                                        inputLabel: colName,
+                                                        inputValue: cellData,
+                                                        showCancelButton: true,
+                                                        inputValidator: (value) => {
+                                                                if (!value) {
+                                                                        return "You need to write something!";
+                                                                }
                                                         }
+                                                });
+                                                if (ipAddress) {
+                                                        cell.data(`${ipAddress}`);
                                                 }
-                                        });
-                                        if (ipAddress) {
-                                                cell.data(`${ipAddress}`);
                                         }
                                 }
                         });
@@ -195,11 +267,12 @@
                         temp_json = JSON.parse(json["result"]);
                         console.log(temp_json);
                         var table_space = document.getElementById("table_space");
-                        table_space.style.display="none";
+                        //table_space.style.display="none";
 
                         var cc = document.getElementById("table_space2");
                         var table = document.createElement("table");
                         table.id = "excel2";
+                        table.setAttribute("class","cell-border");
                         cc.appendChild(table);
                         newtable = $('#excel2').DataTable({
                                         "data": temp_json,
