@@ -30,6 +30,7 @@ def merge_submit():
     if file:
         database = pd.read_excel('database.xlsx')
         data = pd.read_excel(file)
+        #print(data)
         # 使用 rename 方法修改列名
         data = data.rename(columns={'日期': 'date'})
         data = data.rename(columns={'姓名': 'name'})
