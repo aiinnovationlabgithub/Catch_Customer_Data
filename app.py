@@ -35,7 +35,8 @@ def merge_submit():
         data = data.rename(columns={'姓名': 'name'})
         data = data.rename(columns={'金額': 'money'})
 
-        result = pd.merge(data, database, on='name', how='left')
+        #result = pd.merge(data, database, on='name', how='left')
+        result = pd.merge(data, database, on='id', how='left')
         # Convert result to JSON format
         result_json = result.to_json(orient='records', date_format='iso', force_ascii=False)
         #result_json = result.to_json(orient='records')
