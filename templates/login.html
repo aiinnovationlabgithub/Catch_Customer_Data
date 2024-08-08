@@ -58,27 +58,47 @@
                 confirmButtonText: '登入',
                 showCancelButton: false,
                 allowOutsideClick: false,
-                preConfirm: () => {
+                preConfirm: async () => {
                     const username = Swal.getPopup().querySelector('#username').value;
                     const password = Swal.getPopup().querySelector('#password').value;
                     if (!username || !password) {
                         Swal.showValidationMessage('請輸入帳號和密碼');
                         return false;
                     }
+
+                    const data = { username, password };
                     // 在這裡可以處理登入邏輯，例如發送請求到伺服器
-                    if (username === "aiinnovationlab" && password === "aiinnovationlab") {
-                        // 帳號密碼正確，跳轉到 index.html
-                        setCookie('username', username, 1); // 設置 Cookie，有效期 1 天
-                        setCookie('password', password, 1); // 設置 Cookie，有效期 1 天
-                        window.location.href = '/index';
-                    } 
-                    else {
-                        // 帳號密碼錯誤，顯示錯誤信息
-                        Swal.showValidationMessage(
-                            username !== "aiinnovationlab" ? '帳號錯誤' : '密碼錯誤'
-                        );
-                        return false; // 保持在輸入框
-                    }
+                    const options = {
+                                method: "POST",
+                                headers: {
+                                        "Content-Type": "application/json",
+                                },
+                                body: JSON.stringify(data),
+                    };
+
+                    try {
+                        const response = await fetch("/login_check", options);
+                        const json = await response.json();
+                        // 根据返回的 json 结果处理逻辑
+                        if (response.ok) {
+                            if( json.message == "登錄成功" ){
+                                setCookie('username', username, 1); // 設置 Cookie，有效期 1 天
+                                setCookie('password', password, 1); // 設置 Cookie，有效期 1 天
+                                window.location.href = '/index';
+                            }
+                            else{
+                                Swal.showValidationMessage(`${json.message}`);
+                                return false;
+                            }
+                        } 
+                        else {
+                            Swal.showValidationMessage(`伺服器錯誤: ${json.message}`);
+                            return false;
+                        }
+                    } catch (error) {
+                        Swal.showValidationMessage('網路錯誤');
+                        return false;
+                    }          
                 }
             }).then((result) => {
                 /*if (result.isConfirmed) {

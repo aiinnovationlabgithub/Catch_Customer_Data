@@ -23,6 +23,26 @@ def login():
 def index():
     return render_template('index.html')
 
+@app.route('/login_check', methods=['POST'])
+def login_check():
+    # 进行相关处理，比如验证用户名和密码
+    data = request.json
+    username = data.get('username')
+    password = data.get('password')
+    
+    # 定义正确的用户名和密码
+    correct_username = 'aiinnovationlab'
+    correct_password = 'aiinnovationlab'
+    
+    # 验证用户名和密码
+    if username == correct_username and password == correct_password:
+        return jsonify({'status': 200, 'message': '登錄成功'})
+    elif username != correct_username:
+        return jsonify({'status': 401, 'message': '帳號錯誤'})
+    elif password != correct_password:
+        return jsonify({'status': 401, 'message': '密碼錯誤'})
+    
+
 @app.route("/merge_submit", methods=['POST'])
 def merge_submit():
 
