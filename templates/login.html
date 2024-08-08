@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <!-- 引入 SweetAlert2 的 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    <style>
+        body {background-color: rgba(173, 214, 255, 0.3);}
+    </style>
+</head>
+<body>
+    <!-- 引入 SweetAlert2 的 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        // 讀取 Cookie 的函數
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        }
+
+        // 檢查是否有登入的 Cookie
+        function checkLogin() {
+            const username = getCookie('username');
+            const password = getCookie('password');
+
+            if (username && password) {
+                // 有 Cookie，直接跳轉到 index.html
+                window.location.href = '/index';
+            } else {
+                // 沒有 Cookie，顯示登入表單
+                showLoginDialog();
+            }
+        }
+        // 設置 Cookie 的函數
+        function setCookie(name, value, days) {
+            let expires = "";
+            if (days) {
+                const date = new Date();
+                date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+                expires = "; expires=" + date.toUTCString();
+            }
+            document.cookie = name + "=" + (value || "") + expires + "; path=/";
+        }
+        // 顯示 SweetAlert2 對話框
+        function showLoginDialog() {
+            Swal.fire({
+                title: '登入',
+                html: `
+                    <form id="loginForm">
+                        <input type="text" id="username" class="swal2-input" placeholder="帳號" required>
+                        <input type="password" id="password" class="swal2-input" placeholder="密碼" required>
+                    </form>
+                `,
+                focusConfirm: false,
+                confirmButtonText: '登入',
+                showCancelButton: false,
+                allowOutsideClick: false,
+                preConfirm: () => {
+                    const username = Swal.getPopup().querySelector('#username').value;
+                    const password = Swal.getPopup().querySelector('#password').value;
+                    if (!username || !password) {
+                        Swal.showValidationMessage('請輸入帳號和密碼');
+                        return false;
+                    }
+                    // 在這裡可以處理登入邏輯，例如發送請求到伺服器
+                    if (username === "aiinnovationlab" && password === "aiinnovationlab") {
+                        // 帳號密碼正確，跳轉到 index.html
+                        setCookie('username', username, 1); // 設置 Cookie，有效期 1 天
+                        setCookie('password', password, 1); // 設置 Cookie，有效期 1 天
+                        window.location.href = '/index';
+                    } 
+                    else {
+                        // 帳號密碼錯誤，顯示錯誤信息
+                        Swal.showValidationMessage(
+                            username !== "aiinnovationlab" ? '帳號錯誤' : '密碼錯誤'
+                        );
+                        return false; // 保持在輸入框
+                    }
+                }
+            }).then((result) => {
+                /*if (result.isConfirmed) {
+                    // 處理登入成功的邏輯
+                    console.log('帳號:', result.value.username);
+                    console.log('密碼:', result.value.password);
+                }*/
+            });
+        }
+        
+        // 在頁面加載時顯示登入對話框
+        window.onload = checkLogin;
+    </script>
+</body>
+</html>

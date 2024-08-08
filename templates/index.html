@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
         <meta charset="UTF-8">
-        <title>Test</title>
+        <title>Index</title>
         <link rel="stylesheet" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css">
         <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
         <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
@@ -39,47 +39,49 @@
         </style>
 </head>
 <body>
-        <ul class="nav nav-tabs justify-content-center">
-                <li class="nav-item">
-                  <a class="nav-link active" aria-current="page" href="#" id="tab_database">資料庫</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="#" id="tab_mergedata">合併資料</a>
-                </li>
-              </ul>
-        <br>
-        <h1 style="text-align: center;">創新研究部-公益專案</h1>
-        <div class="container">
-                <div id="tab1">
-                        <div class="row">
-                                <div class="col-6">
-                                        <h2>上傳xlsx至資料庫(新增) : </h2><input type="file" id="file-input2"/>
+        <div id="body" style="display: none;">
+                <ul class="nav nav-tabs justify-content-center">
+                        <li class="nav-item">
+                          <a class="nav-link active" aria-current="page" href="#" id="tab_database">資料庫</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="#" id="tab_mergedata">合併資料</a>
+                        </li>
+                      </ul>
+                <br>
+                <h1 style="text-align: center;">創新研究部-公益專案</h1>
+                <div class="container">
+                        <div id="tab1">
+                                <div class="row">
+                                        <div class="col-6">
+                                                <h2>上傳xlsx至資料庫(新增) : </h2><input type="file" id="file-input2"/>
+                                        </div>
+                                        <div class="col-6">
+                                                <h2>送出修改資料至資料庫(修改) : </h2><button id="update_database">送出</button>
+                                        </div>
                                 </div>
-                                <div class="col-6">
-                                        <h2>送出修改資料至資料庫(修改) : </h2><button id="update_database">送出</button>
-                                </div>
-                        </div>
-                        <br>
-                        <div class="row">
-                                <div class="col" id="table_space">
+                                <br>
+                                <div class="row">
+                                        <div class="col" id="table_space">
+                                                
+                                        </div>
                                         
                                 </div>
-                                
                         </div>
-                </div>
-                <div id="tab2" style="display: none;">
-                        <div class="row">
-                                <div class="col-6">
-                                        <h2>匯入客戶資料 : </h2><input type="file" id="file-input"/>
+                        <div id="tab2" style="display: none;">
+                                <div class="row">
+                                        <div class="col-6">
+                                                <h2>匯入客戶資料 : </h2><input type="file" id="file-input"/>
+                                        </div>
+                                        <div class="col-6">
+                                                <h2>下載合併資料 : </h2><button id="download">下載</button>
+                                        </div>
                                 </div>
-                                <div class="col-6">
-                                        <h2>下載合併資料 : </h2><button id="download">下載</button>
-                                </div>
-                        </div>
-                        <br>
-                        <div class="row">
-                                <div class="col" id="table_space2">
-                                        
+                                <br>
+                                <div class="row">
+                                        <div class="col" id="table_space2">
+                                                
+                                        </div>
                                 </div>
                         </div>
                 </div>
@@ -385,5 +387,30 @@
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
         }
+
+        // 讀取 Cookie 的函數
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        }
+
+        // 檢查是否有登入的 Cookie
+        function checkLogin() {
+            const username = getCookie('username');
+            const password = getCookie('password');
+
+            if (username && password) {
+                // 有 Cookie，顯示頁面內容
+                var body = document.getElementById("body");
+                body.style.display="block";
+            } else {
+                // 沒有 Cookie，跳轉到 login.html
+                window.location.href = '/';
+            }
+        }
+
+        // 在頁面加載時檢查登入狀態
+        window.onload = checkLogin;
 </script>
 </html>
