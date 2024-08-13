@@ -36,6 +36,15 @@
 
                 h1 {text-align: center;}
                 body {background-color: rgba(173, 214, 255, 0.3);}
+
+                /* 缩小表格字体大小 */
+                table.dataTable {
+                font-size: 12px; /* 根据需要调整字体大小 */
+                }
+                /* 你也可以调整其他样式，如表头字体大小 */
+                table.dataTable thead th {
+                font-size: 12px; /* 根据需要调整表头字体大小 */
+                }
         </style>
 </head>
 <body>
@@ -188,6 +197,7 @@
                                         "columns": [
                                                 { data: 'id', title: "id"},
                                                 { data: 'name', title: "name"},
+                                                { data: 'donor', title: "donor"},
                                                 { data: 'identity', title: "identity"},
                                                 { data: 'address', title: "address"},
                                                 { data: 'phone', title: "phone"},
@@ -202,7 +212,8 @@
                                         ],
                                         //"searching": false,
                                         "ordering": false,
-                                        "select": true
+                                        "select": true,
+                                        "scrollX": true
                         })
                         $('#excel tbody').on('click', 'button.btn-danger', function() {
                                 var row = newtable.row($(this).parents('tr'));
@@ -228,6 +239,14 @@
                                                 inputValidator: (value) => {
                                                         if (!value) {
                                                                 return "You need to write something!";
+                                                        }
+                                                        else if( colName == "identity" ){
+                                                                if( value.length != 10 ){
+                                                                        return "identity length is wrong!";
+                                                                }
+                                                                else if( !(/^[A-Z]$/.test(value[0])) ){
+                                                                        return "identity first char is wrong!";
+                                                                }
                                                         }
                                                 }
                                         });
@@ -278,6 +297,7 @@
                                         "columns": [
                                                 { data: 'date', title: "date"},
                                                 { data: 'name', title: "name"},
+                                                { data: 'donor', title: "donor"},
                                                 { data: 'money', title: "money"},
                                                 { data: 'id', title: "id"},
                                                 { data: 'identity', title: "identity"},
@@ -294,7 +314,8 @@
                                         ],
                                         //"searching": false,
                                         "ordering": false, 
-                                        "select": true
+                                        "select": true,
+                                        "scrollX": true
                         })
                         /*$('#excel2 tbody').on('click', 'button.btn-danger', function() {
                                 var row = newtable.row($(this).parents('tr'));
