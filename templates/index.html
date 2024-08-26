@@ -388,7 +388,20 @@
         function download(){
                 var data = newtable2.rows().data();
                 var dataArray = data.toArray();
+                var ary = [];
+                ary = dataArray.map(item => item["name"].substr(0, 1));
+                ary.sort((a, b) => a.localeCompare(b, "zh-Hant-TW"));
+                // 创建一个索引字典来映射字符到索引
+                const indexMap = new Map(ary.map((char, index) => [char, index]));
+                // 根据排序数组对 temp_json 进行排序
+                dataArray.sort((a, b) => {
+                        const charA = a["name"].substr(0, 1);
+                        const charB = b["name"].substr(0, 1);
+                        return indexMap.get(charA) - indexMap.get(charB);
+                });
+                //console.log(dataArray);
                 var jsonData = JSON.stringify(dataArray);
+                
                 const wb = XLSX.utils.book_new();
                 const ws = XLSX.utils.json_to_sheet(dataArray);
 
